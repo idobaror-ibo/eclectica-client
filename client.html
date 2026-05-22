@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>בחירת שירים - ECLECTICA</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+      min-height: 100vh;
+    }
+    .header {
+      background: #1a1a2e;
+      color: #fff;
+      padding: 18px 20px;
+      text-align: center;
+    }
+    .header img { height: 40px; margin-bottom: 6px; }
+    .header h1 { font-size: 20px; font-weight: 600; }
+    .header p { font-size: 13px; color: #aaa; margin-top: 4px; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px 16px 80px; }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .event-info { font-size: 15px; color: #444; }
+    .event-info strong { color: #1a1a2e; }
+    .search-box {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      margin-bottom: 12px;
+      direction: rtl;
+    }
+    .search-box:focus { outline: none; border-color: #1a1a2e; }
+    .songs-list { list-style: none; }
+    .song-item {
+      display: flex;
+      align-items: center;
+      padding: 11px 0;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+    }
+    .song-item:last-child { border-bottom: none; }
+    .song-item input[type="checkbox"] { width: 18px; height: 18px; margin-left: 12px; flex-shrink: 0; accent-color: #1a1a2e; }
+    .song-item label { cursor: pointer; font-size: 15px; flex: 1; }
+    .song-item.selected label { font-weight: 600; color: #1a1a2e; }
+    .selected-count {
+      background: #e8f5e9;
+      border: 1px solid #c8e6c9;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 14px;
+      color: #2e7d32;
+      margin-bottom: 12px;
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: #1a1a2e;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .btn-submit:disabled { background: #aaa; cursor: not-allowed; }
+    .btn-submit:not(:disabled):hover { background: #2d2d4e; }
+    .loading { text-align: center; padding: 40px; color: #888; }
+    .spinner {
+      display: inline-block;
+      width: 28px; height: 28px;
+      border: 3px solid #ddd;
+      border-top-color: #1a1a2e;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .success-screen {
+      text-align: center;
+      padding: 40px 20px;
+      display: none;
+    }
+    .success-icon { font-size: 56px; margin-bottom: 12px; }
+    .success-screen h2 { color: #2e7d32; margin-bottom: 8px; }
+    .success-screen p { color: #555; font-size: 15px; }
+    .error-msg {
+      background: #ffebee;
+      border: 1px solid #ffcdd2;
+      color: #c62828;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 14px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <img src="https://drive.google.com/uc?export=view&id=1QWzx_YZtj9RWllFVOyMCh_CMh29bK1vV" alt="ECLECTICA" onerror="this.style.display='none'">
+  <h1>בחירת שירים לאירוע</h1>
+  <p>סמנו את השירים שתרצו לשמוע באירוע שלכם</p>
+</div>
+
+<div class="container">
+
+  <!-- מסך טעינה -->
+  <div id="loadingScreen" class="card loading">
+    <div class="spinner"></div>
+    <div>טוען רשימת שירים...</div>
+  </div>
+
+  <!-- מסך בחירה -->
+  <div id="selectionScreen" style="display:none;">
+    <div class="card" id="eventInfoCard" style="display:none;">
+      <div class="event-info" id="eventInfoText"></div>
+    </div>
+
+    <div class="card">
+      <input type="text" class="search-box" id="searchBox" placeholder="חיפוש שיר..." oninput="filterSongs()">
+      <ul class="songs-list" id="songsList"></ul>
+    </div>
+
+    <div class="card">
+      <div class="selected-count" id="selectedCount">לא נבחרו שירים</div>
+      <button class="btn-submit" id="submitBtn" onclick="submitSelection()">שלח את הבחירה</button>
+      <div class="error-msg" id="errorMsg"></div>
+    </div>
+  </div>
+
+  <!-- מסך הצלחה -->
+  <div class="card success-screen" id="successScreen">
+    <div class="success-icon">✅</div>
+    <h2>הבחירה נשלחה בהצלחה!</h2>
+    <p>קיבלנו את רשימת השירים שלכם.<br>נחזור אליכם בקרוב.</p>
+  </div>
+
+</div>
+
+<script>
+  // =============================================
+  // הגדרות — יש לעדכן את APPS_SCRIPT_URL אחרי פריסה
+  // =============================================
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzsH7v8c5XAlU6YsbiXu17VbzJ9ixqFj7HwsTxdO0YKnbJopxMTAgg-2eBau3iqHn3G2A/exec';
+  const SONGS_SHEET_ID = '1Rg_O_ZIoFa4uQZgUs4viuJjl6PWzzSgcFsozD0T0mWs';
+  // =============================================
+
+  const params = new URLSearchParams(window.location.search);
+  const rowNum = parseInt(params.get('event') || '0');
+
+  let allSongs = [];
+  let selectedSongs = new Set();
+
+  async function init() {
+    if (!rowNum) {
+      document.getElementById('loadingScreen').innerHTML = '<div style="color:#c62828">קישור לא תקין — חסר מספר אירוע.</div>';
+      return;
+    }
+
+    // טעינת שירים מה-Sheet
+    try {
+      const csvUrl = `https://docs.google.com/spreadsheets/d/${SONGS_SHEET_ID}/export?format=csv`;
+      const res = await fetch(csvUrl);
+      const text = await res.text();
+      allSongs = parseCSV(text);
+
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('selectionScreen').style.display = 'block';
+      renderSongs(allSongs);
+      updateCount();
+
+      // טעינת שם הלקוח מה-Script (אופציונלי)
+      if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+        fetchEventInfo();
+      }
+    } catch (err) {
+      document.getElementById('loadingScreen').innerHTML = `<div style="color:#c62828">שגיאה בטעינת השירים. נסו לרענן את הדף.</div>`;
+    }
+  }
+
+  function parseCSV(text) {
+    const lines = text.split('\n').slice(1); // דילוג על כותרת
+    return lines
+      .map(line => line.split(',')[0].trim().replace(/^"|"$/g, ''))
+      .filter(s => s.length > 0);
+  }
+
+  async function fetchEventInfo() {
+    try {
+      const res = await fetch(`${APPS_SCRIPT_URL}?action=eventInfo&rowNum=${rowNum}`);
+      const info = await res.json();
+      if (info.clientName || info.eventDate) {
+        const name = info.displayName || info.clientName;
+        const text = name + (info.eventDate ? ' | ' + info.eventDate : '');
+        document.getElementById('eventInfoText').innerHTML = `שלום <strong>${name}</strong>` + (info.eventDate ? ` — אירוע: <strong>${info.eventDate}</strong>` : '');
+        document.getElementById('eventInfoCard').style.display = 'block';
+      }
+    } catch (e) {
+      // לא קריטי — ממשיכים בלי שם
+    }
+  }
+
+  function renderSongs(songs) {
+    const ul = document.getElementById('songsList');
+    ul.innerHTML = songs.map((song, i) => `
+      <li class="song-item ${selectedSongs.has(song) ? 'selected' : ''}" onclick="toggleSong('${escapeAttr(song)}', this)">
+        <input type="checkbox" id="s${i}" ${selectedSongs.has(song) ? 'checked' : ''} onchange="toggleSong('${escapeAttr(song)}', this.closest('li'))" onclick="event.stopPropagation()">
+        <label for="s${i}">${escapeHtml(song)}</label>
+      </li>
+    `).join('');
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function escapeAttr(s) {
+    return s.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  }
+
+  function toggleSong(song, el) {
+    if (selectedSongs.has(song)) {
+      selectedSongs.delete(song);
+      el.classList.remove('selected');
+      el.querySelector('input').checked = false;
+    } else {
+      selectedSongs.add(song);
+      el.classList.add('selected');
+      el.querySelector('input').checked = true;
+    }
+    updateCount();
+  }
+
+  function filterSongs() {
+    const q = document.getElementById('searchBox').value.toLowerCase();
+    const filtered = allSongs.filter(s => s.toLowerCase().includes(q));
+    renderSongs(filtered);
+  }
+
+  function updateCount() {
+    const n = selectedSongs.size;
+    const countEl = document.getElementById('selectedCount');
+    countEl.textContent = n === 0 ? 'לא נבחרו שירים' : `נבחרו ${n} שירים`;
+    document.getElementById('submitBtn').disabled = (n === 0);
+  }
+
+  async function submitSelection() {
+    if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+      showError('כתובת ה-Script לא הוגדרה עדיין.');
+      return;
+    }
+
+    const songs = Array.from(selectedSongs);
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'שולח...';
+    document.getElementById('errorMsg').style.display = 'none';
+
+    try {
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ rowNum, songs })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        document.getElementById('selectionScreen').style.display = 'none';
+        document.getElementById('successScreen').style.display = 'block';
+      } else {
+        throw new Error(data.error || 'שגיאה לא ידועה');
+      }
+    } catch (err) {
+      showError('שגיאה בשליחה. נסו שוב או פנו אלינו ישירות.');
+      btn.disabled = false;
+      btn.textContent = 'שלח את הבחירה';
+    }
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('errorMsg');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  init();
+</script>
+</body>
+</html>
