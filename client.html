@@ -5,73 +5,78 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>בחירת שירים - ECLECTICA</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; color: #222; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    .header {
-      background: #1a1a2e;
-      color: #fff;
-      padding: 16px 20px;
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    /* Header card */
+    .page-header {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
       text-align: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
     }
-    .header img { height: 36px; margin-bottom: 4px; }
-    .header h1 { font-size: 18px; font-weight: 600; }
-    .header p { font-size: 12px; color: #aaa; margin-top: 2px; }
+    .logo { width: 180px; height: auto; max-width: 100%; margin-bottom: 0.75rem; }
+    .page-header h1 { font-size: 1.5rem; font-weight: 700; color: #1f2937; margin-bottom: 0.25rem; }
+    .page-header p { color: #6b7280; font-size: 0.875rem; }
 
-    .search-bar {
-      background: #fff;
-      padding: 10px 16px;
-      border-bottom: 1px solid #eee;
-      position: sticky;
-      top: 82px;
-      z-index: 99;
+    /* Search */
+    .search-card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      padding: 1rem 1.5rem;
+      margin-bottom: 1rem;
     }
-    .search-bar input {
+    .search-card input {
       width: 100%;
-      padding: 9px 14px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 15px;
+      padding: 0.75rem 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-family: inherit;
       direction: rtl;
+      transition: all 0.2s;
     }
-    .search-bar input:focus { outline: none; border-color: #1a1a2e; }
+    .search-card input:focus { outline: none; border-color: #F39C12; box-shadow: 0 0 0 3px rgba(243,156,18,0.1); }
 
-    .container { max-width: 600px; margin: 0 auto; padding: 12px 16px 120px; }
-
-    .loading { text-align: center; padding: 50px; color: #888; }
-    .spinner {
-      display: inline-block; width: 28px; height: 28px;
-      border: 3px solid #ddd; border-top-color: #1a1a2e;
-      border-radius: 50%; animation: spin 0.8s linear infinite;
-      margin-bottom: 10px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .category-block { margin-bottom: 10px; }
+    /* Category accordion */
+    .category-block { margin-bottom: 0.75rem; }
 
     .category-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: #1a1a2e;
-      color: #fff;
-      padding: 11px 16px;
-      border-radius: 8px;
+      background: #2C5F8D;
+      color: white;
+      padding: 0.875rem 1.25rem;
+      border-radius: 0.75rem;
       cursor: pointer;
       user-select: none;
+      transition: background 0.2s;
     }
-    .category-header:hover { background: #2d2d4e; }
-    .category-header .cat-title { font-size: 15px; font-weight: 600; }
-    .category-header .cat-meta { font-size: 12px; color: #aaa; display: flex; align-items: center; gap: 8px; }
-    .cat-arrow { font-size: 12px; transition: transform 0.2s; }
+    .category-header:hover { background: #1e4a70; }
+    .cat-title { font-size: 1rem; font-weight: 700; }
+    .cat-meta { font-size: 0.8rem; color: #93c5fd; display: flex; align-items: center; gap: 0.5rem; }
+    .cat-arrow { font-size: 0.75rem; transition: transform 0.2s; }
     .cat-arrow.open { transform: rotate(180deg); }
 
     .songs-list {
-      background: #fff;
-      border-radius: 0 0 8px 8px;
+      background: white;
+      border-radius: 0 0 0.75rem 0.75rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.07);
       overflow: hidden;
       display: none;
     }
@@ -80,99 +85,152 @@
     .song-item {
       display: flex;
       align-items: center;
-      padding: 10px 16px;
-      border-bottom: 1px solid #f5f5f5;
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid #f3f4f6;
       cursor: pointer;
       transition: background 0.1s;
     }
     .song-item:last-child { border-bottom: none; }
-    .song-item:hover { background: #f9f9f9; }
-    .song-item.checked { background: #e8f5e9; }
+    .song-item:hover { background: #f9fafb; }
+    .song-item.checked { background: #FFF3E0; }
+
     .song-item input[type="checkbox"] {
-      width: 18px; height: 18px;
-      margin-left: 12px;
+      width: 1.125rem;
+      height: 1.125rem;
+      margin-left: 0.875rem;
       flex-shrink: 0;
-      accent-color: #1a1a2e;
+      accent-color: #F39C12;
       cursor: pointer;
     }
-    .song-name { flex: 1; font-size: 14px; }
-    .song-item.checked .song-name { font-weight: 600; color: #1a1a2e; }
-    .star { color: #f59e0b; margin-right: 4px; font-size: 13px; }
+    .song-name { flex: 1; font-size: 0.9375rem; color: #374151; }
+    .song-item.checked .song-name { font-weight: 600; color: #1f2937; }
+    .star { color: #f59e0b; margin-right: 4px; font-size: 0.8rem; }
 
+    /* Bottom bar */
     .bottom-bar {
       position: fixed;
       bottom: 0; left: 0; right: 0;
-      background: #fff;
-      border-top: 1px solid #eee;
-      padding: 12px 16px;
+      background: white;
+      border-top: 1px solid #e5e7eb;
+      padding: 0.875rem 1rem;
       z-index: 100;
     }
-    .bottom-bar-inner { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
-    .selected-count { font-size: 14px; color: #555; text-align: center; }
-    .selected-count strong { color: #1a1a2e; }
+    .bottom-bar-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .selected-count { flex: 1; font-size: 0.9rem; color: #6b7280; }
+    .selected-count strong { color: #F39C12; font-size: 1rem; }
+
     .btn-submit {
-      width: 100%;
-      padding: 13px;
-      background: #1a1a2e;
-      color: #fff;
+      padding: 0.75rem 1.75rem;
+      background: #F39C12;
+      color: white;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
+      border-radius: 0.5rem;
+      font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
     }
-    .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
-    .btn-submit:not(:disabled):hover { background: #2d2d4e; }
+    .btn-submit:disabled { background: #d1d5db; cursor: not-allowed; }
+    .btn-submit:not(:disabled):hover { background: #E67E22; }
 
     .error-msg {
-      background: #ffebee; border: 1px solid #ffcdd2; color: #c62828;
-      padding: 10px 14px; border-radius: 8px; font-size: 14px;
-      text-align: center; display: none;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      padding: 0.625rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      display: none;
     }
 
-    .success-screen {
-      text-align: center; padding: 60px 20px; display: none;
+    /* Loading */
+    .loading-card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      padding: 3rem;
+      text-align: center;
+      color: #6b7280;
     }
-    .success-icon { font-size: 60px; margin-bottom: 12px; }
-    .success-screen h2 { color: #2e7d32; margin-bottom: 8px; font-size: 22px; }
-    .success-screen p { color: #555; font-size: 15px; line-height: 1.6; }
+    .spinner {
+      display: inline-block; width: 40px; height: 40px;
+      border: 4px solid #f3f4f6; border-top-color: #F39C12;
+      border-radius: 50%; animation: spin 0.9s linear infinite;
+      margin-bottom: 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .no-results { text-align: center; padding: 30px; color: #aaa; font-size: 14px; }
+    /* Success */
+    .success-card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      padding: 3rem 2rem;
+      text-align: center;
+      display: none;
+    }
+    .success-icon { font-size: 3.5rem; margin-bottom: 1rem; }
+    .success-card h2 { color: #16a34a; font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .success-card p { color: #6b7280; font-size: 0.9375rem; line-height: 1.6; }
+
+    .no-results { background: white; border-radius: 1rem; padding: 2rem; text-align: center; color: #6b7280; display: none; }
+
+    .spacer { height: 80px; }
+
+    @media (max-width: 640px) {
+      body { padding: 0.5rem; }
+      .bottom-bar-inner { flex-wrap: wrap; }
+      .btn-submit { width: 100%; }
+    }
   </style>
 </head>
 <body>
 
-<div class="header">
-  <img src="https://drive.google.com/uc?export=view&id=1QWzx_YZtj9RWllFVOyMCh_CMh29bK1vV" alt="ECLECTICA" onerror="this.style.display='none'">
-  <h1>בחירת שירים לאירוע</h1>
-  <p>סמנו את השירים שתרצו לשמוע</p>
-</div>
-
-<div class="search-bar">
-  <input type="text" id="searchBox" placeholder="חיפוש שיר..." oninput="filterSongs()">
-</div>
-
 <div class="container">
-  <div id="loadingScreen" class="loading">
+
+  <div class="page-header">
+    <img src="https://drive.google.com/uc?export=view&id=1QWzx_YZtj9RWllFVOyMCh_CMh29bK1vV" alt="ECLECTICA" class="logo" onerror="this.style.display='none'">
+    <h1>בחירת שירים לאירוע</h1>
+    <p>סמנו את השירים שתרצו לשמוע באירוע שלכם</p>
+  </div>
+
+  <div id="loadingScreen" class="loading-card">
     <div><div class="spinner"></div></div>
     <div>טוען רשימת שירים...</div>
   </div>
+
   <div id="mainContent" style="display:none;">
+    <div class="search-card">
+      <input type="text" id="searchBox" placeholder="חיפוש שיר..." oninput="filterSongs()">
+    </div>
     <div id="categoriesContainer"></div>
-    <div id="noResults" class="no-results" style="display:none;">לא נמצאו שירים</div>
+    <div id="noResults" class="no-results">לא נמצאו שירים תואמים</div>
+    <div class="spacer"></div>
   </div>
-  <div id="successScreen" class="success-screen">
+
+  <div id="successScreen" class="success-card">
     <div class="success-icon">✅</div>
     <h2>הבחירה נשלחה בהצלחה!</h2>
     <p>קיבלנו את רשימת השירים שלכם.<br>נחזור אליכם בקרוב.</p>
   </div>
+
 </div>
 
 <div class="bottom-bar" id="bottomBar">
   <div class="bottom-bar-inner">
     <div class="selected-count" id="selectedCount">לא נבחרו שירים</div>
-    <button class="btn-submit" id="submitBtn" disabled onclick="submitSelection()">שלח את הבחירה</button>
-    <div class="error-msg" id="errorMsg"></div>
+    <div style="display:flex;flex-direction:column;align-items:stretch;">
+      <button class="btn-submit" id="submitBtn" disabled onclick="submitSelection()">שלח את הבחירה</button>
+      <div class="error-msg" id="errorMsg"></div>
+    </div>
   </div>
 </div>
 
@@ -188,7 +246,7 @@
 
   async function init() {
     if (!rowNum) {
-      document.getElementById('loadingScreen').innerHTML = '<div style="color:#c62828;padding:40px;">קישור לא תקין — חסר מספר אירוע.</div>';
+      document.getElementById('loadingScreen').innerHTML = '<div style="color:#dc2626">קישור לא תקין — חסר מספר אירוע.</div>';
       return;
     }
     try {
@@ -199,7 +257,7 @@
       document.getElementById('loadingScreen').style.display = 'none';
       document.getElementById('mainContent').style.display = 'block';
     } catch (err) {
-      document.getElementById('loadingScreen').innerHTML = '<div style="color:#c62828;padding:40px;">שגיאה בטעינת השירים. נסו לרענן.</div>';
+      document.getElementById('loadingScreen').innerHTML = '<div style="color:#dc2626">שגיאה בטעינת השירים. נסו לרענן.</div>';
     }
   }
 
@@ -223,9 +281,7 @@
     let totalVisible = 0;
 
     Object.entries(categoriesData).forEach(([cat, songs]) => {
-      const filtered = filter
-        ? songs.filter(s => s.song.toLowerCase().includes(filter))
-        : songs;
+      const filtered = filter ? songs.filter(s => s.song.toLowerCase().includes(filter)) : songs;
       if (filtered.length === 0) return;
       totalVisible += filtered.length;
 
@@ -235,16 +291,15 @@
       const block = document.createElement('div');
       block.className = 'category-block';
 
-      const header = document.createElement('div');
-      header.className = 'category-header';
       const arrow = document.createElement('span');
       arrow.className = 'cat-arrow' + (isOpen ? ' open' : '');
       arrow.textContent = '▼';
 
       const catCountSpan = document.createElement('span');
-      catCountSpan.className = 'cat-count';
       updateCatCountSpan(catCountSpan, filtered.length, selectedInCat);
 
+      const header = document.createElement('div');
+      header.className = 'category-header';
       header.innerHTML = `<span class="cat-title">${escapeHtml(cat)}</span>`;
       const meta = document.createElement('span');
       meta.className = 'cat-meta';
@@ -284,15 +339,9 @@
 
         item.onclick = (e) => {
           if (e.target !== cb) cb.checked = !cb.checked;
-          if (cb.checked) {
-            selectedSongs.add(song);
-            item.classList.add('checked');
-          } else {
-            selectedSongs.delete(song);
-            item.classList.remove('checked');
-          }
-          const newSelCount = filtered.filter(s => selectedSongs.has(s.song)).length;
-          updateCatCountSpan(catCountSpan, filtered.length, newSelCount);
+          if (cb.checked) { selectedSongs.add(song); item.classList.add('checked'); }
+          else { selectedSongs.delete(song); item.classList.remove('checked'); }
+          updateCatCountSpan(catCountSpan, filtered.length, filtered.filter(s => selectedSongs.has(s.song)).length);
           updateCount();
         };
 
@@ -310,7 +359,7 @@
 
   function updateCatCountSpan(span, total, selected) {
     span.innerHTML = selected > 0
-      ? `${total} שירים &middot; <strong style="color:#a5d6a7">${selected} נבחרו</strong>`
+      ? `${total} שירים &middot; <strong style="color:#fcd34d">${selected} נבחרו</strong>`
       : `${total} שירים`;
   }
 
@@ -321,8 +370,7 @@
 
   function updateCount() {
     const n = selectedSongs.size;
-    const el = document.getElementById('selectedCount');
-    el.innerHTML = n === 0 ? 'לא נבחרו שירים' : `נבחרו <strong>${n}</strong> שירים`;
+    document.getElementById('selectedCount').innerHTML = n === 0 ? 'לא נבחרו שירים' : `נבחרו <strong>${n}</strong> שירים`;
     document.getElementById('submitBtn').disabled = n === 0;
   }
 
