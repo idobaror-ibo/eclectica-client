@@ -80,31 +80,34 @@
       overflow: hidden;
       display: none;
     }
-    .songs-list.open { display: block; }
+    .songs-list.open { display: grid; grid-template-columns: 1fr 1fr; }
 
     .song-item {
       display: flex;
       align-items: center;
-      padding: 0.75rem 1.25rem;
+      padding: 0.625rem 1rem;
       border-bottom: 1px solid #f3f4f6;
       cursor: pointer;
       transition: background 0.1s;
     }
-    .song-item:last-child { border-bottom: none; }
     .song-item:hover { background: #f9fafb; }
     .song-item.checked { background: #FFF3E0; }
 
     .song-item input[type="checkbox"] {
-      width: 1.125rem;
-      height: 1.125rem;
-      margin-left: 0.875rem;
+      width: 1rem;
+      height: 1rem;
+      margin-left: 0.625rem;
       flex-shrink: 0;
       accent-color: #F39C12;
       cursor: pointer;
     }
-    .song-name { flex: 1; font-size: 0.9375rem; color: #374151; }
+    .song-name { flex: 1; font-size: 0.875rem; color: #374151; }
     .song-item.checked .song-name { font-weight: 600; color: #1f2937; }
-    .star { color: #f59e0b; margin-right: 4px; font-size: 0.8rem; }
+    .star { color: #f59e0b; margin-right: 3px; font-size: 0.75rem; }
+
+    @media (max-width: 480px) {
+      .songs-list.open { grid-template-columns: 1fr; }
+    }
 
     /* Bottom bar */
     .bottom-bar {
