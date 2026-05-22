@@ -6,105 +6,138 @@
   <title>בחירת שירים - ECLECTICA</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: #f5f5f5;
-      color: #222;
-      min-height: 100vh;
-    }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; color: #222; }
+
     .header {
       background: #1a1a2e;
       color: #fff;
-      padding: 18px 20px;
+      padding: 16px 20px;
       text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .header img { height: 40px; margin-bottom: 6px; }
-    .header h1 { font-size: 20px; font-weight: 600; }
-    .header p { font-size: 13px; color: #aaa; margin-top: 4px; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px 16px 80px; }
-    .card {
+    .header img { height: 36px; margin-bottom: 4px; }
+    .header h1 { font-size: 18px; font-weight: 600; }
+    .header p { font-size: 12px; color: #aaa; margin-top: 2px; }
+
+    .search-bar {
       background: #fff;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 16px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      padding: 10px 16px;
+      border-bottom: 1px solid #eee;
+      position: sticky;
+      top: 82px;
+      z-index: 99;
     }
-    .event-info { font-size: 15px; color: #444; }
-    .event-info strong { color: #1a1a2e; }
-    .search-box {
+    .search-bar input {
       width: 100%;
-      padding: 10px 14px;
+      padding: 9px 14px;
       border: 1px solid #ddd;
       border-radius: 8px;
       font-size: 15px;
-      margin-bottom: 12px;
       direction: rtl;
     }
-    .search-box:focus { outline: none; border-color: #1a1a2e; }
-    .songs-list { list-style: none; }
+    .search-bar input:focus { outline: none; border-color: #1a1a2e; }
+
+    .container { max-width: 600px; margin: 0 auto; padding: 12px 16px 120px; }
+
+    .loading { text-align: center; padding: 50px; color: #888; }
+    .spinner {
+      display: inline-block; width: 28px; height: 28px;
+      border: 3px solid #ddd; border-top-color: #1a1a2e;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+      margin-bottom: 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .category-block { margin-bottom: 10px; }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #1a1a2e;
+      color: #fff;
+      padding: 11px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .category-header:hover { background: #2d2d4e; }
+    .category-header .cat-title { font-size: 15px; font-weight: 600; }
+    .category-header .cat-meta { font-size: 12px; color: #aaa; display: flex; align-items: center; gap: 8px; }
+    .cat-arrow { font-size: 12px; transition: transform 0.2s; }
+    .cat-arrow.open { transform: rotate(180deg); }
+
+    .songs-list {
+      background: #fff;
+      border-radius: 0 0 8px 8px;
+      overflow: hidden;
+      display: none;
+    }
+    .songs-list.open { display: block; }
+
     .song-item {
       display: flex;
       align-items: center;
-      padding: 11px 0;
-      border-bottom: 1px solid #f0f0f0;
+      padding: 10px 16px;
+      border-bottom: 1px solid #f5f5f5;
       cursor: pointer;
+      transition: background 0.1s;
     }
     .song-item:last-child { border-bottom: none; }
-    .song-item input[type="checkbox"] { width: 18px; height: 18px; margin-left: 12px; flex-shrink: 0; accent-color: #1a1a2e; }
-    .song-item label { cursor: pointer; font-size: 15px; flex: 1; }
-    .song-item.selected label { font-weight: 600; color: #1a1a2e; }
-    .selected-count {
-      background: #e8f5e9;
-      border: 1px solid #c8e6c9;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 14px;
-      color: #2e7d32;
-      margin-bottom: 12px;
+    .song-item:hover { background: #f9f9f9; }
+    .song-item.checked { background: #e8f5e9; }
+    .song-item input[type="checkbox"] {
+      width: 18px; height: 18px;
+      margin-left: 12px;
+      flex-shrink: 0;
+      accent-color: #1a1a2e;
+      cursor: pointer;
     }
+    .song-name { flex: 1; font-size: 14px; }
+    .song-item.checked .song-name { font-weight: 600; color: #1a1a2e; }
+    .star { color: #f59e0b; margin-right: 4px; font-size: 13px; }
+
+    .bottom-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #fff;
+      border-top: 1px solid #eee;
+      padding: 12px 16px;
+      z-index: 100;
+    }
+    .bottom-bar-inner { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+    .selected-count { font-size: 14px; color: #555; text-align: center; }
+    .selected-count strong { color: #1a1a2e; }
     .btn-submit {
       width: 100%;
-      padding: 14px;
+      padding: 13px;
       background: #1a1a2e;
       color: #fff;
       border: none;
       border-radius: 10px;
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      margin-top: 8px;
     }
-    .btn-submit:disabled { background: #aaa; cursor: not-allowed; }
+    .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
     .btn-submit:not(:disabled):hover { background: #2d2d4e; }
-    .loading { text-align: center; padding: 40px; color: #888; }
-    .spinner {
-      display: inline-block;
-      width: 28px; height: 28px;
-      border: 3px solid #ddd;
-      border-top-color: #1a1a2e;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-bottom: 10px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .success-screen {
-      text-align: center;
-      padding: 40px 20px;
-      display: none;
-    }
-    .success-icon { font-size: 56px; margin-bottom: 12px; }
-    .success-screen h2 { color: #2e7d32; margin-bottom: 8px; }
-    .success-screen p { color: #555; font-size: 15px; }
+
     .error-msg {
-      background: #ffebee;
-      border: 1px solid #ffcdd2;
-      color: #c62828;
-      padding: 10px 14px;
-      border-radius: 8px;
-      margin-top: 10px;
-      font-size: 14px;
-      display: none;
+      background: #ffebee; border: 1px solid #ffcdd2; color: #c62828;
+      padding: 10px 14px; border-radius: 8px; font-size: 14px;
+      text-align: center; display: none;
     }
+
+    .success-screen {
+      text-align: center; padding: 60px 20px; display: none;
+    }
+    .success-icon { font-size: 60px; margin-bottom: 12px; }
+    .success-screen h2 { color: #2e7d32; margin-bottom: 8px; font-size: 22px; }
+    .success-screen p { color: #555; font-size: 15px; line-height: 1.6; }
+
+    .no-results { text-align: center; padding: 30px; color: #aaa; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -112,157 +145,188 @@
 <div class="header">
   <img src="https://drive.google.com/uc?export=view&id=1QWzx_YZtj9RWllFVOyMCh_CMh29bK1vV" alt="ECLECTICA" onerror="this.style.display='none'">
   <h1>בחירת שירים לאירוע</h1>
-  <p>סמנו את השירים שתרצו לשמוע באירוע שלכם</p>
+  <p>סמנו את השירים שתרצו לשמוע</p>
+</div>
+
+<div class="search-bar">
+  <input type="text" id="searchBox" placeholder="חיפוש שיר..." oninput="filterSongs()">
 </div>
 
 <div class="container">
-
-  <!-- מסך טעינה -->
-  <div id="loadingScreen" class="card loading">
-    <div class="spinner"></div>
+  <div id="loadingScreen" class="loading">
+    <div><div class="spinner"></div></div>
     <div>טוען רשימת שירים...</div>
   </div>
-
-  <!-- מסך בחירה -->
-  <div id="selectionScreen" style="display:none;">
-    <div class="card" id="eventInfoCard" style="display:none;">
-      <div class="event-info" id="eventInfoText"></div>
-    </div>
-
-    <div class="card">
-      <input type="text" class="search-box" id="searchBox" placeholder="חיפוש שיר..." oninput="filterSongs()">
-      <ul class="songs-list" id="songsList"></ul>
-    </div>
-
-    <div class="card">
-      <div class="selected-count" id="selectedCount">לא נבחרו שירים</div>
-      <button class="btn-submit" id="submitBtn" onclick="submitSelection()">שלח את הבחירה</button>
-      <div class="error-msg" id="errorMsg"></div>
-    </div>
+  <div id="mainContent" style="display:none;">
+    <div id="categoriesContainer"></div>
+    <div id="noResults" class="no-results" style="display:none;">לא נמצאו שירים</div>
   </div>
-
-  <!-- מסך הצלחה -->
-  <div class="card success-screen" id="successScreen">
+  <div id="successScreen" class="success-screen">
     <div class="success-icon">✅</div>
     <h2>הבחירה נשלחה בהצלחה!</h2>
     <p>קיבלנו את רשימת השירים שלכם.<br>נחזור אליכם בקרוב.</p>
   </div>
+</div>
 
+<div class="bottom-bar" id="bottomBar">
+  <div class="bottom-bar-inner">
+    <div class="selected-count" id="selectedCount">לא נבחרו שירים</div>
+    <button class="btn-submit" id="submitBtn" disabled onclick="submitSelection()">שלח את הבחירה</button>
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
 </div>
 
 <script>
-  // =============================================
-  // הגדרות — יש לעדכן את APPS_SCRIPT_URL אחרי פריסה
-  // =============================================
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzsH7v8c5XAlU6YsbiXu17VbzJ9ixqFj7HwsTxdO0YKnbJopxMTAgg-2eBau3iqHn3G2A/exec';
   const SONGS_SHEET_ID = '1Rg_O_ZIoFa4uQZgUs4viuJjl6PWzzSgcFsozD0T0mWs';
-  // =============================================
 
   const params = new URLSearchParams(window.location.search);
   const rowNum = parseInt(params.get('event') || '0');
 
-  let allSongs = [];
+  let categoriesData = {};
   let selectedSongs = new Set();
 
   async function init() {
     if (!rowNum) {
-      document.getElementById('loadingScreen').innerHTML = '<div style="color:#c62828">קישור לא תקין — חסר מספר אירוע.</div>';
+      document.getElementById('loadingScreen').innerHTML = '<div style="color:#c62828;padding:40px;">קישור לא תקין — חסר מספר אירוע.</div>';
       return;
     }
-
-    // טעינת שירים מה-Sheet
     try {
-      const csvUrl = `https://docs.google.com/spreadsheets/d/${SONGS_SHEET_ID}/export?format=csv`;
-      const res = await fetch(csvUrl);
+      const res = await fetch(`https://docs.google.com/spreadsheets/d/${SONGS_SHEET_ID}/export?format=csv`);
       const text = await res.text();
-      allSongs = parseCSV(text);
-
+      parseCSV(text);
+      renderCategories(null);
       document.getElementById('loadingScreen').style.display = 'none';
-      document.getElementById('selectionScreen').style.display = 'block';
-      renderSongs(allSongs);
-      updateCount();
-
-      // טעינת שם הלקוח מה-Script (אופציונלי)
-      if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
-        fetchEventInfo();
-      }
+      document.getElementById('mainContent').style.display = 'block';
     } catch (err) {
-      document.getElementById('loadingScreen').innerHTML = `<div style="color:#c62828">שגיאה בטעינת השירים. נסו לרענן את הדף.</div>`;
+      document.getElementById('loadingScreen').innerHTML = '<div style="color:#c62828;padding:40px;">שגיאה בטעינת השירים. נסו לרענן.</div>';
     }
   }
 
   function parseCSV(text) {
-    const lines = text.split('\n').slice(1); // דילוג על כותרת
-    return lines
-      .map(line => line.split(',')[0].trim().replace(/^"|"$/g, ''))
-      .filter(s => s.length > 0);
+    const lines = text.split('\n').slice(1);
+    categoriesData = {};
+    lines.forEach(line => {
+      const parts = line.split(',');
+      const cat = (parts[0] || '').trim().replace(/^"|"$/g, '');
+      const song = (parts[1] || '').trim().replace(/^"|"$/g, '');
+      const star = (parts[2] || '').includes('⭐');
+      if (!cat || !song) return;
+      if (!categoriesData[cat]) categoriesData[cat] = [];
+      categoriesData[cat].push({ song, star });
+    });
   }
 
-  async function fetchEventInfo() {
-    try {
-      const res = await fetch(`${APPS_SCRIPT_URL}?action=eventInfo&rowNum=${rowNum}`);
-      const info = await res.json();
-      if (info.clientName || info.eventDate) {
-        const name = info.displayName || info.clientName;
-        const text = name + (info.eventDate ? ' | ' + info.eventDate : '');
-        document.getElementById('eventInfoText').innerHTML = `שלום <strong>${name}</strong>` + (info.eventDate ? ` — אירוע: <strong>${info.eventDate}</strong>` : '');
-        document.getElementById('eventInfoCard').style.display = 'block';
-      }
-    } catch (e) {
-      // לא קריטי — ממשיכים בלי שם
-    }
-  }
+  function renderCategories(filter) {
+    const container = document.getElementById('categoriesContainer');
+    container.innerHTML = '';
+    let totalVisible = 0;
 
-  function renderSongs(songs) {
-    const ul = document.getElementById('songsList');
-    ul.innerHTML = songs.map((song, i) => `
-      <li class="song-item ${selectedSongs.has(song) ? 'selected' : ''}" onclick="toggleSong('${escapeAttr(song)}', this)">
-        <input type="checkbox" id="s${i}" ${selectedSongs.has(song) ? 'checked' : ''} onchange="toggleSong('${escapeAttr(song)}', this.closest('li'))" onclick="event.stopPropagation()">
-        <label for="s${i}">${escapeHtml(song)}</label>
-      </li>
-    `).join('');
-  }
+    Object.entries(categoriesData).forEach(([cat, songs]) => {
+      const filtered = filter
+        ? songs.filter(s => s.song.toLowerCase().includes(filter))
+        : songs;
+      if (filtered.length === 0) return;
+      totalVisible += filtered.length;
 
-  function escapeHtml(s) {
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
+      const selectedInCat = filtered.filter(s => selectedSongs.has(s.song)).length;
+      const isOpen = !!filter || selectedInCat > 0;
 
-  function escapeAttr(s) {
-    return s.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-  }
+      const block = document.createElement('div');
+      block.className = 'category-block';
 
-  function toggleSong(song, el) {
-    if (selectedSongs.has(song)) {
-      selectedSongs.delete(song);
-      el.classList.remove('selected');
-      el.querySelector('input').checked = false;
-    } else {
-      selectedSongs.add(song);
-      el.classList.add('selected');
-      el.querySelector('input').checked = true;
-    }
+      const header = document.createElement('div');
+      header.className = 'category-header';
+      const arrow = document.createElement('span');
+      arrow.className = 'cat-arrow' + (isOpen ? ' open' : '');
+      arrow.textContent = '▼';
+
+      const catCountSpan = document.createElement('span');
+      catCountSpan.className = 'cat-count';
+      updateCatCountSpan(catCountSpan, filtered.length, selectedInCat);
+
+      header.innerHTML = `<span class="cat-title">${escapeHtml(cat)}</span>`;
+      const meta = document.createElement('span');
+      meta.className = 'cat-meta';
+      meta.appendChild(catCountSpan);
+      meta.appendChild(arrow);
+      header.appendChild(meta);
+
+      const list = document.createElement('div');
+      list.className = 'songs-list' + (isOpen ? ' open' : '');
+
+      header.onclick = () => {
+        const open = list.classList.toggle('open');
+        arrow.classList.toggle('open', open);
+      };
+
+      filtered.forEach(({ song, star }) => {
+        const checked = selectedSongs.has(song);
+        const item = document.createElement('div');
+        item.className = 'song-item' + (checked ? ' checked' : '');
+
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = checked;
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'song-name';
+        if (star) {
+          const starEl = document.createElement('span');
+          starEl.className = 'star';
+          starEl.textContent = '⭐';
+          nameSpan.appendChild(starEl);
+        }
+        nameSpan.appendChild(document.createTextNode(song));
+
+        item.appendChild(cb);
+        item.appendChild(nameSpan);
+
+        item.onclick = (e) => {
+          if (e.target !== cb) cb.checked = !cb.checked;
+          if (cb.checked) {
+            selectedSongs.add(song);
+            item.classList.add('checked');
+          } else {
+            selectedSongs.delete(song);
+            item.classList.remove('checked');
+          }
+          const newSelCount = filtered.filter(s => selectedSongs.has(s.song)).length;
+          updateCatCountSpan(catCountSpan, filtered.length, newSelCount);
+          updateCount();
+        };
+
+        list.appendChild(item);
+      });
+
+      block.appendChild(header);
+      block.appendChild(list);
+      container.appendChild(block);
+    });
+
+    document.getElementById('noResults').style.display = totalVisible === 0 ? 'block' : 'none';
     updateCount();
   }
 
+  function updateCatCountSpan(span, total, selected) {
+    span.innerHTML = selected > 0
+      ? `${total} שירים &middot; <strong style="color:#a5d6a7">${selected} נבחרו</strong>`
+      : `${total} שירים`;
+  }
+
   function filterSongs() {
-    const q = document.getElementById('searchBox').value.toLowerCase();
-    const filtered = allSongs.filter(s => s.toLowerCase().includes(q));
-    renderSongs(filtered);
+    const q = document.getElementById('searchBox').value.toLowerCase().trim();
+    renderCategories(q || null);
   }
 
   function updateCount() {
     const n = selectedSongs.size;
-    const countEl = document.getElementById('selectedCount');
-    countEl.textContent = n === 0 ? 'לא נבחרו שירים' : `נבחרו ${n} שירים`;
-    document.getElementById('submitBtn').disabled = (n === 0);
+    const el = document.getElementById('selectedCount');
+    el.innerHTML = n === 0 ? 'לא נבחרו שירים' : `נבחרו <strong>${n}</strong> שירים`;
+    document.getElementById('submitBtn').disabled = n === 0;
   }
 
   async function submitSelection() {
-    if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
-      showError('כתובת ה-Script לא הוגדרה עדיין.');
-      return;
-    }
-
     const songs = Array.from(selectedSongs);
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
@@ -277,24 +341,24 @@
         body: JSON.stringify({ rowNum, songs })
       });
       const data = await res.json();
-
       if (data.success) {
-        document.getElementById('selectionScreen').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'none';
+        document.getElementById('bottomBar').style.display = 'none';
         document.getElementById('successScreen').style.display = 'block';
       } else {
-        throw new Error(data.error || 'שגיאה לא ידועה');
+        throw new Error(data.error || 'שגיאה');
       }
     } catch (err) {
-      showError('שגיאה בשליחה. נסו שוב או פנו אלינו ישירות.');
+      const errEl = document.getElementById('errorMsg');
+      errEl.textContent = 'שגיאה בשליחה. נסו שוב.';
+      errEl.style.display = 'block';
       btn.disabled = false;
       btn.textContent = 'שלח את הבחירה';
     }
   }
 
-  function showError(msg) {
-    const el = document.getElementById('errorMsg');
-    el.textContent = msg;
-    el.style.display = 'block';
+  function escapeHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
   init();
